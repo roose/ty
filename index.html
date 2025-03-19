@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background-color: #0e0e10;
+      color: rgb(239, 239, 241);
+      margin: 0;
+      padding: 0;
+      height: 100dvh;
+      display: flex;
+    }
+
+    .clear {
+      display: none;
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 50%;
+      background: rgb(145, 71, 255);
+      color: rgb(239, 239, 241);
+      font-weight: 600;
+      border-radius: 4px;
+      border: none;
+      height: 30px;
+      cursor: pointer;
+      padding: 0 10px;
+      border-top-left-radius: 0px;
+      border-top-right-radius: 0px;
+    }
+
+    .clear.active {
+      display: block;
+    }
+
+    .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      z-index: 10;
+      background-color: #0e0e10;
+    }
+
+    .placeholder ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .placeholder li {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    .placeholder button {
+      background: rgb(145, 71, 255);
+      color: rgb(239, 239, 241);
+      font-weight: 600;
+      border-radius: 4px;
+      border: none;
+      height: 30px;
+      cursor: pointer;
+      padding: 0 10px;
+    }
+
+    label {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .active {
+      display: block !important;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .youtube {
+      width: calc(100% - 340px);
+      height: 100%;
+      display: flex;
+      position: relative;
+    }
+
+    .youtube:hover .clear {
+      display: block;
+    }
+
+    .youtube iframe {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .twitch {
+      width: 340px;
+      display: flex;
+    }
+
+    .twitch iframe {
+      display: none;
+    }
+
+    input {
+      width: 340px;
+      font-size: 14px;
+      background-color: #0e0e10;
+      color: rgb(239, 239, 241);
+      border: none;
+      box-shadow: inset 0 0 0 1px rgba(222, 222, 227, 0.4);
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #a970ff, inset 0 0 0 2px #a970ff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="placeholder">
+    <ul>
+      <li>
+        <label for="youtube_input">Пожалуйста, вставьте ссылку с YouTube</label>
+        <input type="text" id="youtube_input" placeholder="Например https://youtu.be/8Z92pxjtMmE">
+      </li>
+      <li>
+        <label for="twitch_input">Вставьте название канала с Twitch</label>
+        <input type="text" id="twitch_input" placeholder="Например wrugb">
+      </li>
+      <li>
+        <button>Поехали!</button>
+      </li>
+    </ul>
+  </div>
+  <div class="youtube">
+    <button class="clear">Очистить</button>
+    <iframe id="youtube" width="1280" height="720" src="" tsrc="https://www.youtube.com/embed/8Z92pxjtMmE"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+    </iframe>
+  </div>
+
+  <div class="twitch">
+    <iframe id="twitch-chat-embed" src=""
+      tsrc="https://www.twitch.tv/embed/wrugb/chat?darkpopout&parent=roose.github.io" frameborder="0" height="100%"
+      width="340"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      sandbox="allow-storage-access-by-user-activation allow-scripts allow-popups allow-popups-to-escape-sandbox allow-modals allow-forms allow-same-origin">
+    </iframe>
+  </div>
+
+  <script>
+    function getYouTubeId(url) {
+      const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    const goBtn = document.querySelector('.placeholder button');
+    const placeholder = document.querySelector('.placeholder');
+    const clearBtn = document.querySelector('.clear');
+    const youtube = document.getElementById('youtube');
+    const twitch = document.getElementById('twitch-chat-embed');
+    const youtubeInput = document.getElementById('youtube_input');
+    const twitchInput = document.getElementById('twitch_input');
+    let store = JSON.parse(localStorage.getItem('twitch-youtube') || '{}');
+
+    if (store && store.ytid && store.twname) {
+      youtube.src = `https://www.youtube.com/embed/${store.ytid}`;
+      youtube.classList.add('active');
+      twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?${store.twtheme}&parent=roose.github.io`;
+      twitch.classList.add('active');
+      placeholder.classList.add('hidden');
+    }
+
+    goBtn.addEventListener('click', () => {
+      if(getYouTubeId(youtubeInput.value)) {
+        store.ytid = getYouTubeId(youtubeInput.value);
+        localStorage.setItem('twitch-youtube', JSON.stringify(store));
+        youtube.src = `https://www.youtube.com/embed/${store.ytid}`;
+        youtube.classList.add('active');
+      }
+      if(twitchInput.value) {
+        store.twname = twitchInput.value;
+        localStorage.setItem('twitch-youtube', JSON.stringify(store));
+        twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?${store.twtheme}&parent=roose.github.io`;
+        twitch.classList.add('active');
+      }
+      placeholder.classList.add('hidden');
+    });
+
+    clearBtn.addEventListener('click', () => {
+      store = {};
+      localStorage.setItem('twitch-youtube', JSON.stringify(store));
+      youtube.src = '';
+      youtube.classList.remove('active');
+      twitch.src = '';
+      twitch.classList.remove('active');
+      placeholder.classList.remove('hidden');
+    });
+
+    // youtubeInput.addEventListener('change', () => {
+    //   if(getYouTubeId(youtubeInput.value)) {
+    //     store.ytid = getYouTubeId(youtubeInput.value);
+    //     localStorage.setItem('twitch-youtube', JSON.stringify(store));
+    //     youtube.src = `https://www.youtube.com/embed/${store.ytid}`;
+    //     youtube.classList.add('active');
+    //     yotubePlaceholder.classList.add('hidden');
+    //   }
+    // });
+
+    // twitchInput.addEventListener('change', () => {
+    //   console.log(twitchInput.value);
+
+    //   store.twname = twitchInput.value;
+    //   localStorage.setItem('twitch-youtube', JSON.stringify(store));
+    //   twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopoutz&parent=roose.github.io`;
+    //   twitch.classList.add('active');
+    //   twitchPlaceholder.classList.add('hidden');
+    // });
+
+  </script>
+</body>
+
+</html>
