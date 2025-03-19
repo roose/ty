@@ -204,7 +204,7 @@
       if(twitchInput.value) {
         store.twname = twitchInput.value;
         localStorage.setItem('twitch-youtube', JSON.stringify(store));
-        twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?${store.twtheme}&parent=roose.github.io`;
+        twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopout&parent=roose.github.io`;
         twitch.classList.add('active');
       }
       placeholder.classList.add('hidden');
