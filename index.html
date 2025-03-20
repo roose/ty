@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>YouTube player + Twitch chat</title>
   <style>
     * {
       box-sizing: border-box;
@@ -140,7 +140,7 @@
   <div class="placeholder">
     <ul>
       <li>
-        <label for="youtube_input">Пожалуйста, вставьте ссылку с YouTube</label>
+        <label for="youtube_input">Вставьте ссылку с YouTube</label>
         <input type="text" id="youtube_input" placeholder="Например https://youtu.be/8Z92pxjtMmE">
       </li>
       <li>
@@ -195,19 +195,21 @@
     }
 
     goBtn.addEventListener('click', () => {
-      if(getYouTubeId(youtubeInput.value)) {
-        store.ytid = getYouTubeId(youtubeInput.value);
-        localStorage.setItem('twitch-youtube', JSON.stringify(store));
-        youtube.src = `https://www.youtube.com/embed/${store.ytid}`;
-        youtube.classList.add('active');
+      if(youtubeInput.value && twitchInput.value) {
+        if(getYouTubeId(youtubeInput.value)) {
+          store.ytid = getYouTubeId(youtubeInput.value);
+          localStorage.setItem('twitch-youtube', JSON.stringify(store));
+          youtube.src = `https://www.youtube.com/embed/${store.ytid}`;
+          youtube.classList.add('active');
+        }
+        if(twitchInput.value) {
+          store.twname = twitchInput.value;
+          localStorage.setItem('twitch-youtube', JSON.stringify(store));
+          twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopout&parent=roose.github.io`;
+          twitch.classList.add('active');
+        }
+        placeholder.classList.add('hidden');
       }
-      if(twitchInput.value) {
-        store.twname = twitchInput.value;
-        localStorage.setItem('twitch-youtube', JSON.stringify(store));
-        twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopout&parent=roose.github.io`;
-        twitch.classList.add('active');
-      }
-      placeholder.classList.add('hidden');
     });
 
     clearBtn.addEventListener('click', () => {
@@ -219,26 +221,6 @@
       twitch.classList.remove('active');
       placeholder.classList.remove('hidden');
     });
-
-    // youtubeInput.addEventListener('change', () => {
-    //   if(getYouTubeId(youtubeInput.value)) {
-    //     store.ytid = getYouTubeId(youtubeInput.value);
-    //     localStorage.setItem('twitch-youtube', JSON.stringify(store));
-    //     youtube.src = `https://www.youtube.com/embed/${store.ytid}`;
-    //     youtube.classList.add('active');
-    //     yotubePlaceholder.classList.add('hidden');
-    //   }
-    // });
-
-    // twitchInput.addEventListener('change', () => {
-    //   console.log(twitchInput.value);
-
-    //   store.twname = twitchInput.value;
-    //   localStorage.setItem('twitch-youtube', JSON.stringify(store));
-    //   twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopoutz&parent=roose.github.io`;
-    //   twitch.classList.add('active');
-    //   twitchPlaceholder.classList.add('hidden');
-    // });
 
   </script>
 </body>
