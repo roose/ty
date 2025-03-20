@@ -177,6 +177,14 @@
       return match ? match[1] : null;
     }
 
+    function setTitle(url, nickname) {
+      fetch(`https://noembed.com/embed?dataType=json&url=${url}`)
+        .then(response => response.json())
+        .then(data => {
+          document.title = `${nickname} - ${data.title}`;
+        })
+    }
+
     const goBtn = document.querySelector('.placeholder button');
     const placeholder = document.querySelector('.placeholder');
     const clearBtn = document.querySelector('.clear');
@@ -191,6 +199,7 @@
       youtube.classList.add('active');
       twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopout&parent=roose.github.io`;
       twitch.classList.add('active');
+      setTitle(`https://youtu.be/${store.ytid}`, store.twname);
       placeholder.classList.add('hidden');
     }
 
@@ -208,6 +217,7 @@
           twitch.src = `https://www.twitch.tv/embed/${store.twname}/chat?darkpopout&parent=roose.github.io`;
           twitch.classList.add('active');
         }
+        setTitle(youtubeInput.value, twitchInput.value);
         placeholder.classList.add('hidden');
       }
     });
